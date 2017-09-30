@@ -6,16 +6,15 @@
 
 namespace cppapi
 {
-	class project final
+	CPPAPI_CLASS project final
 	{
 	public:
 		void load(const std::string& path);
 		void save(const std::string& path) const;
 
 	private:
-		static constexpr const std::uint8_t magic_number_[8]
-			= { 0xC8, 'F', 'U', 'C', 'K', 'C', 'P', 'P' };
-		static constexpr const std::uint64_t version_ = 0;
+		static const std::uint8_t magic_number_[8];
+		static const std::uint64_t version_;
 	};
 }
 

@@ -48,4 +48,8 @@ namespace cppapi
 
 		file.close();
 	}
+
+	const std::uint8_t project::magic_number_[]
+		= { 0xC8, 'F', 'U', 'C', 'K', 'C', 'P', 'P' };
+	const std::uint64_t project::version_ = 0;
 }
