@@ -2,7 +2,7 @@
 #define CPPAPI_HEADER_CONFIG_HH
 
 #if defined(CPPAPI_MODULE) && defined(CPPAPI_DYNAMIC) && defined(_MSC_VER)
-#	error To compile module on MSVC, you must use static linking.
+#	error Compiling module in MSVC, you must use static linking.
 #endif
 
 #if defined(CPPAPI) && defined(CPPAPI_MODULE)
