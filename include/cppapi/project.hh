@@ -6,15 +6,23 @@
 
 namespace cppapi
 {
+	class source;
+
 	CPPAPI_CLASS project final
 	{
 	public:
 		void load(const std::string& path);
 		void save(const std::string& path) const;
+		void add_source(source* source);
+		void add_source_fast(source* source);
+		void erase_source(source* source);
 
 	private:
 		static const std::uint8_t magic_number_[8];
 		static const std::uint64_t version_;
+
+	private:
+		std::vector<source*> sources_;
 	};
 }
 

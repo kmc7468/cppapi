@@ -1,6 +1,11 @@
 #ifndef CPPAPI_HEADER_CONFIG_HH
 #define CPPAPI_HEADER_CONFIG_HH
 
+// TODO: 나중에 지워주세요.
+#ifdef CPPAPI_MODULE
+#	error cppapi doesn't support compiling module yet.
+#endif
+
 #if defined(CPPAPI_MODULE) && defined(CPPAPI_DYNAMIC) && defined(_MSC_VER)
 #	error Compiling module in MSVC, you must use static linking.
 #endif

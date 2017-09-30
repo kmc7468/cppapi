@@ -1,11 +1,13 @@
 #ifdef CPPAPI_MODULE
 import cppapi.project;
+
+import cppapi.source;
 #else
 #	include <cppapi/project.hh>
 
-#	include <fstream>
-#	include <ios>
-#	include <stdexcept>
+#	include <cppapi/source.hh>
+
+#	include <algorithm>
 #	include <vector>
 #endif
 
@@ -15,38 +17,29 @@ namespace cppapi
 {
 	void project::load(const std::string& path)
 	{
-		std::basic_ifstream<std::uint8_t> file(path, std::ios::binary);
-
-		if (!file.is_open())
-		{
-			throw std::ios_base::failure("파일을 열지 못했습니다.");
-		}
-
-		std::vector<std::uint8_t> buffer;
-		
-		buffer.resize(8);
-		file.read(&buffer[0], 8);
-
-		if (!std::equal(buffer.begin(), buffer.end(), magic_number_, magic_number_ + 8))
-		{
-			file.close();
-			throw std::invalid_argument("cppapi 프로젝트 파일이 아닙니다.");
-		}
-
-		file.close();
+		// TODO
 	}
 	void project::save(const std::string& path) const
 	{
-		std::basic_ofstream<std::uint8_t> file(path, std::ios::binary);
-		
-		if (!file.is_open())
-		{
-			throw std::ios_base::failure("파일을 열지 못했습니다.");
-		}
+		// TODO
+	}
+	void project::add_source(source* source)
+	{
+		if (std::find(sources_.begin(), sources_.end(), source) != sources_.end()) return;
 
-		file << magic_number_;
+		sources_.push_back(source);
+	}
+	void project::add_source_fast(source* source)
+	{
+		sources_.push_back(source);
+	}
+	void project::erase_source(source* source)
+	{
+		std::vector<cppapi::source*>::iterator source_iter;
 
-		file.close();
+		if (source_iter = std::find(sources_.begin(), sources_.end(), source); source_iter == sources_.end()) return;
+
+		sources_.erase(source_iter);
 	}
 
 	const std::uint8_t project::magic_number_[]
