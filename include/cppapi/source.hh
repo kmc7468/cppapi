@@ -24,13 +24,14 @@ namespace cppapi
 		bool operator!=(const source& source) const = delete;
 
 	public:
-		static source* create_source(project& project, const std::string& name);
-		static source* create_source(project& project, const std::string& name, bool auto_remove);
+		static source* create(project& project, const std::string& name);
+		static source* create(project& project, const std::string& name, bool auto_remove);
 
 	public:
 		std::string name() const;
 		std::string name(const std::string& name);
 		bool auto_remove() const noexcept;
+		bool auto_remove(bool auto_remove) noexcept;
 
 	private:
 		project& project_;

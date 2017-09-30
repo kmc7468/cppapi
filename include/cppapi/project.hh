@@ -11,6 +11,12 @@ namespace cppapi
 	CPPAPI_CLASS project final
 	{
 	public:
+		project();
+		project(const project& project) = delete;
+		project(project&& project) noexcept = delete;
+		~project();
+
+	public:
 		void load(const std::string& path);
 		void save(const std::string& path) const;
 		void add_source(source* source);

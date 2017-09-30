@@ -15,6 +15,19 @@ import cppapi.source;
 
 namespace cppapi
 {
+	project::project()
+	{}
+	project::~project()
+	{
+		for (source* src : sources_)
+		{
+			if (src->auto_remove())
+			{
+				delete src;
+			}
+		}
+	}
+
 	void project::load(const std::string& path)
 	{
 		// TODO

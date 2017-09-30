@@ -9,11 +9,7 @@ import cppapi.source;
 namespace cppapi
 {
 	source::~source()
-	{
-		if (!auto_remove_) return;
-
-		project_.erase_source(this);
-	}
+	{}
 
 	source::source(project& project, const std::string& name)
 		: source(project, name, true)
@@ -23,14 +19,14 @@ namespace cppapi
 		name_(name)
 	{}
 
-	source* source::create_source(project& project, const std::string& name)
+	source* source::create(project& project, const std::string& name)
 	{
 		source* source = new cppapi::source(project, name);
 		project.add_source_fast(source);
 
 		return source;
 	}
-	source* source::create_source(project& project, const std::string& name, bool auto_remove)
+	source* source::create(project& project, const std::string& name, bool auto_remove)
 	{
 		source* source = new cppapi::source(project, name, auto_remove);
 		project.add_source_fast(source);
@@ -49,5 +45,9 @@ namespace cppapi
 	bool source::auto_remove() const noexcept
 	{
 		return auto_remove_;
+	}
+	bool source::auto_remove(bool auto_remove) noexcept
+	{
+		return auto_remove_ = auto_remove;
 	}
 }
