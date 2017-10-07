@@ -46,6 +46,14 @@ namespace cppapi
 	{
 		sources_.push_back(source);
 	}
+	void project::remove_source(source* source)
+	{
+		std::vector<cppapi::source*>::iterator source_iter;
+
+		if (source_iter = std::find(sources_.begin(), sources_.end(), source); source_iter == sources_.end()) return;
+
+		sources_.erase(source_iter);
+	}
 	void project::erase_source(source* source)
 	{
 		std::vector<cppapi::source*>::iterator source_iter;
@@ -63,4 +71,5 @@ namespace cppapi
 	const std::uint8_t project::magic_number_[]
 		= { 0xC8, 'F', 'U', 'C', 'K', 'C', 'P', 'P' };
 	const std::uint64_t project::version_ = 0;
+	const std::size_t project::length_max_ = 4294967295;
 }
