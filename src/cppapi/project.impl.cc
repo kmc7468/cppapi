@@ -8,6 +8,8 @@ import cppapi.source;
 #	include <cppapi/source.hh>
 
 #	include <algorithm>
+#	include <cstdio>
+#	include <stdexcept>
 #	include <vector>
 #endif
 
@@ -34,7 +36,38 @@ namespace cppapi
 	}
 	void project::save(const std::string& path) const
 	{
-		// TODO
+		std::FILE* file = std::fopen(path.c_str(), "wb");
+
+		if (file == nullptr)
+			throw std::invalid_argument("Failed to open file.");
+
+		struct file_raii
+		{
+			file_raii(std::FILE* file)
+				: file(file)
+			{}
+			~file_raii()
+			{
+				std::fclose(file);
+			}
+
+			std::FILE* file;
+		} file_raii_inst(file);
+
+		std::fwrite(project::magic_number_, sizeof(std::uint8_t), 8, file);
+		std::fwrite(&project::version_, sizeof(std::uint32_t), 1, file);
+
+		std::uint32_t source_count = sources_.size();
+		std::fwrite(&source_count, sizeof(std::uint32_t), 1, file);
+
+		for (const source* src : sources_)
+		{
+			bool src_auto_remove = src->auto_remove();
+			std::fwrite(&src_auto_remove, sizeof(bool), 1, file);
+
+			std::string src_name = src->name();
+			std::fwrite(src_name.c_str(), src_name.length(), 1, file);
+		}
 	}
 	void project::add_source(source* source)
 	{
@@ -70,6 +103,6 @@ namespace cppapi
 
 	const std::uint8_t project::magic_number_[]
 		= { 0xC8, 'F', 'U', 'C', 'K', 'C', 'P', 'P' };
-	const std::uint64_t project::version_ = 0;
+	const std::uint32_t project::version_ = 0;
 	const std::size_t project::length_max_ = 4294967295;
 }

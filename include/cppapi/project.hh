@@ -26,7 +26,7 @@ namespace cppapi
 
 	private:
 		static const std::uint8_t magic_number_[8];
-		static const std::uint64_t version_;
+		static const std::uint32_t version_;
 		static const std::size_t length_max_;
 
 	private:
