@@ -9,6 +9,8 @@ import cppapi.source;
 
 #	include <algorithm>
 #	include <cstdio>
+#	include <cstdlib>
+#	include <new>
 #	include <stdexcept>
 #	include <vector>
 #endif
@@ -32,7 +34,77 @@ namespace cppapi
 
 	void project::load(const std::string& path)
 	{
-		// TODO
+		std::FILE* file = std::fopen(path.c_str(), "rb");
+
+		if (file == nullptr)
+			throw std::invalid_argument("Failed to open file.");
+
+		struct file_raii
+		{
+			file_raii(std::FILE* file)
+				: file(file)
+			{}
+			~file_raii()
+			{
+				std::fclose(file);
+			}
+
+			std::FILE* file;
+		} file_raii_inst(file);
+
+		bool is_big_endian = false;
+
+		{
+			std::uint16_t temp = 1;
+
+			if (*reinterpret_cast<std::uint8_t*>(&temp) == 0)
+			{
+				is_big_endian = true;
+			}
+		}
+
+		std::uint8_t* buffer = reinterpret_cast<std::uint8_t*>(std::calloc(8, sizeof(std::uint8_t)));
+
+		if (buffer == nullptr)
+			throw std::bad_alloc();
+
+		struct buffer_raii
+		{
+			buffer_raii(std::uint8_t** buffer)
+				: buffer(buffer)
+			{}
+			~buffer_raii()
+			{
+				std::free(*buffer);
+			}
+			
+			std::uint8_t** buffer;
+		} buffer_raii_inst(&buffer);
+
+		std::fread(buffer, sizeof(std::uint8_t), 8, file);
+
+		if (!std::equal(buffer, buffer + 8, project::magic_number_, project::magic_number_ + 8))
+			throw std::invalid_argument("The loaded file is not a normal cppapi project file.");
+
+		std::fread(buffer, sizeof(std::uint32_t), 1, file);
+
+		std::uint32_t loaded_version = *reinterpret_cast<std::uint32_t*>(buffer);
+
+		if (is_big_endian)
+		{
+			std::reverse(reinterpret_cast<std::uint8_t*>(&loaded_version),
+				reinterpret_cast<std::uint8_t*>(&loaded_version) + 4);
+		}
+
+		switch (loaded_version)
+		{
+		case 0:
+			load_v0_(file, &buffer, is_big_endian);
+			break;
+
+		default:
+			throw std::invalid_argument("Does not support the loaded cppapi project file's version.");
+		}
 	}
 	void project::save(const std::string& path) const
 	{
@@ -90,6 +162,13 @@ namespace cppapi
 			bool src_auto_remove = src->auto_remove();
 			std::fwrite(&src_auto_remove, sizeof(bool), 1, file);
 
+			std::size_t src_name_length = src->name().length();
+			if (is_big_endian)
+			{
+				std::reverse(reinterpret_cast<std::uint8_t*>(&src_name_length),
+					reinterpret_cast<std::uint8_t*>(&src_name_length) + 4);
+			}
+			std::fwrite(&src_name_length, sizeof(std::uint32_t), 1, file);
 			std::string src_name = src->name();
 			std::fwrite(src_name.c_str(), src_name.length(), 1, file);
 		}
@@ -124,6 +203,41 @@ namespace cppapi
 		}
 
 		sources_.erase(source_iter);
+	}
+
+	void project::load_v0_(std::FILE* file, std::uint8_t** buffer, bool is_big_endian)
+	{
+		std::fread(*buffer, sizeof(std::uint32_t), 1, file);
+
+		std::uint32_t source_count = *reinterpret_cast<std::uint32_t*>(*buffer);
+
+		if (is_big_endian)
+		{
+			std::reverse(reinterpret_cast<std::uint8_t*>(&source_count),
+				reinterpret_cast<std::uint8_t*>(&source_count) + 4);
+		}
+
+		for (std::uint32_t i = 0; i < source_count; ++i)
+		{
+			std::fread(*buffer, sizeof(bool), 1, file);
+			bool src_auto_remove = *reinterpret_cast<bool*>(*buffer);
+			
+			std::fread(*buffer, sizeof(std::uint32_t), 1, file);
+			std::size_t src_name_length = *reinterpret_cast<std::uint32_t*>(*buffer);
+			if (is_big_endian)
+			{
+				std::reverse(reinterpret_cast<std::uint8_t*>(&src_name_length),
+					reinterpret_cast<std::uint8_t*>(&src_name_length) + 4);
+			}
+
+			*buffer = reinterpret_cast<std::uint8_t*>(std::realloc(*buffer, sizeof(std::uint8_t) * src_name_length));
+			if (*buffer == nullptr)
+				throw std::bad_alloc();
+			std::fread(*buffer, sizeof(std::uint8_t), src_name_length, file);
+			std::string src_name(reinterpret_cast<char*>(*buffer), src_name_length);
+
+			source* src = source::create(*this, src_name, src_auto_remove);
+		}
 	}
 
 	const std::uint8_t project::magic_number_[]

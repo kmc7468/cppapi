@@ -25,6 +25,9 @@ namespace cppapi
 		void erase_source(source* source);
 
 	private:
+		void load_v0_(std::FILE* file, std::uint8_t** buffer, bool is_big_endian);
+
+	private:
 		static const std::uint8_t magic_number_[8];
 		static const std::uint32_t version_;
 		static const std::size_t length_max_;
