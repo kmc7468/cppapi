@@ -54,10 +54,35 @@ namespace cppapi
 			std::FILE* file;
 		} file_raii_inst(file);
 
+		bool is_big_endian = false;
+		
+		{
+			std::uint16_t temp = 1;
+
+			if (*reinterpret_cast<std::uint8_t*>(&temp) == 0)
+			{
+				is_big_endian = true;
+			}
+		}
+
 		std::fwrite(project::magic_number_, sizeof(std::uint8_t), 8, file);
-		std::fwrite(&project::version_, sizeof(std::uint32_t), 1, file);
+		if (is_big_endian)
+		{
+			std::int32_t version_reversed = project::version_;
+			std::reverse(reinterpret_cast<std::uint8_t*>(&version_reversed),
+				reinterpret_cast<std::uint8_t*>(&version_reversed) + 4);
+		}
+		else
+		{
+			std::fwrite(&project::version_, sizeof(std::uint32_t), 1, file);
+		}
 
 		std::uint32_t source_count = sources_.size();
+		if (is_big_endian)
+		{
+			std::reverse(reinterpret_cast<std::uint8_t*>(&source_count),
+				reinterpret_cast<std::uint8_t*>(&source_count) + 4);
+		}
 		std::fwrite(&source_count, sizeof(std::uint32_t), 1, file);
 
 		for (const source* src : sources_)
