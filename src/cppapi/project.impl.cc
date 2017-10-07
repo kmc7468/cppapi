@@ -52,6 +52,11 @@ namespace cppapi
 
 		if (source_iter = std::find(sources_.begin(), sources_.end(), source); source_iter == sources_.end()) return;
 
+		if ((*source_iter)->auto_remove())
+		{
+			delete *source_iter;
+		}
+
 		sources_.erase(source_iter);
 	}
 
