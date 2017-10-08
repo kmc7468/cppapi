@@ -2,6 +2,7 @@
 module cppapi;
 
 export import cppapi.builder;
+export import cppapi.code;
 export import cppapi.project;
 export import cppapi.source;
 #endif
