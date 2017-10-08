@@ -17,6 +17,16 @@ import cppapi.source;
 
 #include <cppapi/details/project.inc.hh>
 
+///// project::gc_ 클래스
+namespace cppapi
+{
+	project::gc_::gc_()
+	{}
+	project::gc_::~gc_()
+	{}
+}
+
+///// project 클래스
 namespace cppapi
 {
 	project::project()
