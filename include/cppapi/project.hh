@@ -10,31 +10,6 @@ namespace cppapi
 
 	CPPAPI_CLASS project final
 	{
-	private:
-		class gc_ final
-		{
-		public:
-			enum class value_type
-			{
-				source
-			};
-
-		public:
-			gc_();
-			gc_(const gc_& gc) = delete;
-			gc_(gc_&& gc) noexcept = delete;
-			~gc_();
-
-		public:
-			gc_& operator=(const gc_& gc) = delete;
-			gc_& operator=(gc_&& gc) noexcept = delete;
-			bool operator==(const gc_& gc) const = delete;
-			bool operator!=(const gc_& gc) const = delete;
-			
-		private:
-			std::vector<std::pair<value_type, void*>> allocated_memories_;
-		};
-
 	public:
 		project();
 		project(const project& project) = delete;
@@ -46,7 +21,6 @@ namespace cppapi
 		void save(const std::string& path) const;
 		void add_source(source* source);
 		void add_source_fast(source* source);
-		void remove_source(source* source);
 		void erase_source(source* source);
 
 	private:

@@ -17,16 +17,6 @@ import cppapi.source;
 
 #include <cppapi/details/project.inc.hh>
 
-///// project::gc_ 클래스
-namespace cppapi
-{
-	project::gc_::gc_()
-	{}
-	project::gc_::~gc_()
-	{}
-}
-
-///// project 클래스
 namespace cppapi
 {
 	project::project()
@@ -193,24 +183,11 @@ namespace cppapi
 	{
 		sources_.push_back(source);
 	}
-	void project::remove_source(source* source)
-	{
-		std::vector<cppapi::source*>::iterator source_iter;
-
-		if (source_iter = std::find(sources_.begin(), sources_.end(), source); source_iter == sources_.end()) return;
-
-		sources_.erase(source_iter);
-	}
 	void project::erase_source(source* source)
 	{
 		std::vector<cppapi::source*>::iterator source_iter;
 
 		if (source_iter = std::find(sources_.begin(), sources_.end(), source); source_iter == sources_.end()) return;
-
-		if ((*source_iter)->auto_remove())
-		{
-			delete *source_iter;
-		}
 
 		sources_.erase(source_iter);
 	}

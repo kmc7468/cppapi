@@ -6,7 +6,6 @@ import std.core;
 #else
 #	include <cstdint>
 #	include <string>
-#	include <utility>
 #	include <vector>
 #endif
 
