@@ -26,6 +26,9 @@ namespace cppapi
 	private:
 		void load_v0_(std::FILE* file, std::uint8_t** buffer, bool is_big_endian);
 
+	public:
+		const std::vector<source*>& sources() const noexcept;
+
 	private:
 		static const std::uint8_t magic_number_[8];
 		static const std::uint32_t version_;

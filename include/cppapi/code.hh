@@ -6,18 +6,28 @@
 
 namespace cppapi
 {
-	CPPAPI_CLASS code final
+	CPPAPI_CLASS code
 	{
 	public:
 		code(const code& code) = delete;
 		code(code&& code) noexcept = delete;
-		~code();
+		virtual ~code();
 
 	private:
 		code(source& source);
+		code(source& source, bool auto_remove);
+
+	public:
+		static code* create(source* source);
+		static code* create(source* source, bool auto_remove);
+
+	public:
+		bool auto_remove() const noexcept;
+		bool auto_remove(bool auto_remove) noexcept;
 
 	private:
 		source& source_;
+		bool auto_remove_;
 	};
 }
 

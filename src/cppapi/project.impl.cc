@@ -1,10 +1,12 @@
 #ifdef CPPAPI_MODULE
 import cppapi.project;
 
+import cppapi.code;
 import cppapi.source;
 #else
 #	include <cppapi/project.hh>
 
+#	include <cppapi/code.hh>
 #	include <cppapi/source.hh>
 
 #	include <algorithm>
@@ -30,6 +32,13 @@ namespace cppapi
 				delete src;
 			}
 		}
+	}
+
+#define BIG_ENDIAN_REVERSE(name)										\
+	if (is_big_endian)													\
+	{																	\
+		std::reverse(reinterpret_cast<std::uint8_t*>(&name),			\
+			reinterpret_cast<std::uint8_t*>(&name) + sizeof(name));		\
 	}
 
 	void project::load(const std::string& path)
@@ -89,12 +98,7 @@ namespace cppapi
 		std::fread(buffer, sizeof(std::uint32_t), 1, file);
 
 		std::uint32_t loaded_version = *reinterpret_cast<std::uint32_t*>(buffer);
-
-		if (is_big_endian)
-		{
-			std::reverse(reinterpret_cast<std::uint8_t*>(&loaded_version),
-				reinterpret_cast<std::uint8_t*>(&loaded_version) + 4);
-		}
+		BIG_ENDIAN_REVERSE(loaded_version);
 
 		switch (loaded_version)
 		{
@@ -150,11 +154,7 @@ namespace cppapi
 		}
 
 		std::uint32_t source_count = sources_.size();
-		if (is_big_endian)
-		{
-			std::reverse(reinterpret_cast<std::uint8_t*>(&source_count),
-				reinterpret_cast<std::uint8_t*>(&source_count) + 4);
-		}
+		BIG_ENDIAN_REVERSE(source_count);
 		std::fwrite(&source_count, sizeof(std::uint32_t), 1, file);
 
 		for (const source* src : sources_)
@@ -163,14 +163,20 @@ namespace cppapi
 			std::fwrite(&src_auto_remove, sizeof(bool), 1, file);
 
 			std::size_t src_name_length = src->name().length();
-			if (is_big_endian)
-			{
-				std::reverse(reinterpret_cast<std::uint8_t*>(&src_name_length),
-					reinterpret_cast<std::uint8_t*>(&src_name_length) + 4);
-			}
+			BIG_ENDIAN_REVERSE(src_name_length);
 			std::fwrite(&src_name_length, sizeof(std::uint32_t), 1, file);
 			std::string src_name = src->name();
 			std::fwrite(src_name.c_str(), src_name.length(), 1, file);
+
+			std::uint32_t src_codes_count = src->codes().size();
+			BIG_ENDIAN_REVERSE(src_codes_count);
+			std::fwrite(&src_codes_count, sizeof(std::uint32_t), 1, file);
+
+			for (const code* src_code : src->codes())
+			{
+				bool src_code_auto_remove = src_code->auto_remove();
+				std::fwrite(&src_code_auto_remove, sizeof(bool), 1, file);
+			}
 		}
 	}
 	void project::add_source(source* source)
@@ -197,12 +203,7 @@ namespace cppapi
 		std::fread(*buffer, sizeof(std::uint32_t), 1, file);
 
 		std::uint32_t source_count = *reinterpret_cast<std::uint32_t*>(*buffer);
-
-		if (is_big_endian)
-		{
-			std::reverse(reinterpret_cast<std::uint8_t*>(&source_count),
-				reinterpret_cast<std::uint8_t*>(&source_count) + 4);
-		}
+		BIG_ENDIAN_REVERSE(source_count);
 
 		for (std::uint32_t i = 0; i < source_count; ++i)
 		{
@@ -211,11 +212,7 @@ namespace cppapi
 			
 			std::fread(*buffer, sizeof(std::uint32_t), 1, file);
 			std::size_t src_name_length = *reinterpret_cast<std::uint32_t*>(*buffer);
-			if (is_big_endian)
-			{
-				std::reverse(reinterpret_cast<std::uint8_t*>(&src_name_length),
-					reinterpret_cast<std::uint8_t*>(&src_name_length) + 4);
-			}
+			BIG_ENDIAN_REVERSE(src_name_length);
 
 			*buffer = reinterpret_cast<std::uint8_t*>(std::realloc(*buffer, sizeof(std::uint8_t) * src_name_length));
 			if (*buffer == nullptr)
@@ -224,7 +221,24 @@ namespace cppapi
 			std::string src_name(reinterpret_cast<char*>(*buffer), src_name_length);
 
 			source* src = source::create(*this, src_name, src_auto_remove);
+
+			std::fread(*buffer, sizeof(std::uint32_t), 1, file);
+			std::size_t src_codes_count = *reinterpret_cast<std::uint32_t*>(*buffer);
+			BIG_ENDIAN_REVERSE(src_codes_count);
+
+			for (std::size_t j = 0; j < src_codes_count; ++j)
+			{
+				std::fread(*buffer, sizeof(bool), 1, file);
+				bool src_code_auto_remove = *reinterpret_cast<bool*>(*buffer);
+
+				code* src_code = code::create(src, src_code_auto_remove);
+			}
 		}
+	}
+
+	const std::vector<source*>& project::sources() const noexcept
+	{
+		return sources_;
 	}
 
 	const std::uint8_t project::magic_number_[]

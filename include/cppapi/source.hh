@@ -6,6 +6,8 @@
 
 namespace cppapi
 {
+	class code;
+
 	CPPAPI_CLASS source final
 	{
 	public:
@@ -28,16 +30,24 @@ namespace cppapi
 		static source* create(project& project, const std::string& name, bool auto_remove);
 
 	public:
+		void add_code(code* code);
+		void add_code_fast(code* code);
+		void erase_code(code* code);
+
+	public:
 		std::string name() const;
 		std::string name(const std::string& name);
 		bool auto_remove() const noexcept;
 		bool auto_remove(bool auto_remove) noexcept;
+
+		const std::vector<code*>& codes() const noexcept;
 
 	private:
 		project& project_;
 		bool auto_remove_;
 
 		std::string name_;
+		std::vector<code*> codes_;
 	};
 }
 

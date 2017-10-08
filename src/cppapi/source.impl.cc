@@ -1,7 +1,11 @@
 #ifdef CPPAPI_MODULE
 import cppapi.source;
+
+import cppapi.code;
 #else
 #	include <cppapi/source.hh>
+
+#	include <cppapi/code.hh>
 #endif
 
 #include <cppapi/details/source.inc.hh>
@@ -9,7 +13,15 @@ import cppapi.source;
 namespace cppapi
 {
 	source::~source()
-	{}
+	{
+		for (code* code : codes_)
+		{
+			if (code->auto_remove())
+			{
+				delete code;
+			}
+		}
+	}
 
 	source::source(project& project, const std::string& name)
 		: source(project, name, true)
@@ -34,6 +46,25 @@ namespace cppapi
 		return source;
 	}
 
+	void source::add_code(code* code)
+	{
+		if (std::find(codes_.begin(), codes_.end(), code) != codes_.end()) return;
+
+		codes_.push_back(code);
+	}
+	void source::add_code_fast(code* code)
+	{
+		codes_.push_back(code);
+	}
+	void source::erase_code(code* code)
+	{
+		std::vector<cppapi::code*>::iterator code_iter;
+
+		if (code_iter = std::find(codes_.begin(), codes_.end(), code); code_iter == codes_.end()) return;
+
+		codes_.erase(code_iter);
+	}
+
 	std::string source::name() const
 	{
 		return name_;
@@ -49,5 +80,10 @@ namespace cppapi
 	bool source::auto_remove(bool auto_remove) noexcept
 	{
 		return auto_remove_ = auto_remove;
+	}
+
+	const std::vector<code*>& source::codes() const noexcept
+	{
+		return codes_;
 	}
 }

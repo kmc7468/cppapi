@@ -6,9 +6,10 @@ import std.core;
 
 import cppapi.project;
 #else
-#	include <string>
-
 #	include <cppapi/project.hh>
+
+#	include <string>
+#	include <vector>
 #endif
 
 #endif
