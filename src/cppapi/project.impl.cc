@@ -159,24 +159,7 @@ namespace cppapi
 
 		for (const source* src : sources_)
 		{
-			bool src_auto_remove = src->auto_remove();
-			std::fwrite(&src_auto_remove, sizeof(bool), 1, file);
-
-			std::size_t src_name_length = src->name().length();
-			BIG_ENDIAN_REVERSE(src_name_length);
-			std::fwrite(&src_name_length, sizeof(std::uint32_t), 1, file);
-			std::string src_name = src->name();
-			std::fwrite(src_name.c_str(), src_name.length(), 1, file);
-
-			std::uint32_t src_codes_count = src->codes().size();
-			BIG_ENDIAN_REVERSE(src_codes_count);
-			std::fwrite(&src_codes_count, sizeof(std::uint32_t), 1, file);
-
-			for (const code* src_code : src->codes())
-			{
-				bool src_code_auto_remove = src_code->auto_remove();
-				std::fwrite(&src_code_auto_remove, sizeof(bool), 1, file);
-			}
+			src->get_saver()(file, is_big_endian);
 		}
 	}
 	void project::add_source(source* source)

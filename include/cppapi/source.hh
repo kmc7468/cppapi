@@ -10,6 +10,8 @@ namespace cppapi
 
 	CPPAPI_CLASS source final
 	{
+		friend class source_saver;
+
 	public:
 		source(const source& source) = delete;
 		source(source&& source) noexcept = delete;
@@ -34,6 +36,8 @@ namespace cppapi
 		void add_code_fast(code* code);
 		void erase_code(code* code);
 
+		source_saver get_saver() const;
+
 	public:
 		std::string name() const;
 		std::string name(const std::string& name);
@@ -48,6 +52,32 @@ namespace cppapi
 
 		std::string name_;
 		std::vector<code*> codes_;
+	};
+
+	CPPAPI_CLASS source_saver final
+	{
+		friend class project;
+
+	public:
+		source_saver(const source& source);
+		source_saver(const source_saver& saver);
+		source_saver(source_saver&& saver) noexcept = delete;
+		~source_saver();
+
+	public:
+		source_saver& operator=(const source_saver& saver) = delete;
+		source_saver& operator=(source_saver&& saver) noexcept = delete;
+		bool operator==(const source_saver& saver) const = delete;
+		bool operator!=(const source_saver& saver) const = delete;
+
+	private:
+		void operator()(std::FILE* file, bool is_big_endian) const;
+
+	private:
+		void save(std::FILE* file, bool is_big_endian) const;
+
+	private:
+		const source& source_;
 	};
 }
 

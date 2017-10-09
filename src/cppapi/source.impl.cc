@@ -10,6 +10,7 @@ import cppapi.code;
 
 #include <cppapi/details/source.inc.hh>
 
+// source 클래스
 namespace cppapi
 {
 	source::~source()
@@ -65,6 +66,11 @@ namespace cppapi
 		codes_.erase(code_iter);
 	}
 
+	source_saver source::get_saver() const
+	{
+		return *this;
+	}
+
 	std::string source::name() const
 	{
 		return name_;
@@ -85,5 +91,48 @@ namespace cppapi
 	const std::vector<code*>& source::codes() const noexcept
 	{
 		return codes_;
+	}
+}
+
+#define BIG_ENDIAN_REVERSE(name)										\
+	if (is_big_endian)													\
+	{																	\
+		std::reverse(reinterpret_cast<std::uint8_t*>(&name),			\
+			reinterpret_cast<std::uint8_t*>(&name) + sizeof(name));		\
+	}
+
+// source_saver 클래스
+namespace cppapi
+{
+	source_saver::source_saver(const source& source)
+		: source_(source)
+	{}
+	source_saver::source_saver(const source_saver& saver)
+		: source_(saver.source_)
+	{}
+
+	void source_saver::operator()(std::FILE* file, bool is_big_endian) const
+	{
+		save(file, is_big_endian);
+	}
+
+	void source_saver::save(std::FILE* file, bool is_big_endian) const
+	{
+		std::fwrite(&source_.auto_remove_, sizeof(bool), 1, file);
+		
+		std::uint32_t name_length = source_.name_.length();
+		BIG_ENDIAN_REVERSE(name_length);
+		std::fwrite(&name_length, sizeof(std::uint32_t), 1, file);
+
+		std::fwrite(source_.name_.c_str(), sizeof(std::uint8_t), name_length, file);
+
+		std::uint32_t codes_count = source_.codes_.size();
+		BIG_ENDIAN_REVERSE(codes_count);
+		std::fwrite(&codes_count, sizeof(std::uint32_t), 1, file);
+
+		for (const code* code : source_.codes_)
+		{
+			code->get_saver()(file, is_big_endian);
+		}
 	}
 }

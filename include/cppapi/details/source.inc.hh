@@ -8,6 +8,7 @@ import cppapi.project;
 #else
 #	include <cppapi/project.hh>
 
+#	include <cstdio>
 #	include <string>
 #	include <vector>
 #endif
