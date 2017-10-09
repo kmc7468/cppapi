@@ -1,6 +1,6 @@
 bin/
-*.cpp
 *.dat
+main.*
 
 # CMake
 CMakeFiles/
