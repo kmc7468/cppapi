@@ -13,6 +13,9 @@ extern "C"
 
 	CPPAPI_C_EXPORT int project_init(project* project);
 	CPPAPI_C_EXPORT int project_del(project* project);
+	
+	CPPAPI_C_EXPORT int project_load(project project, const char* path);
+	CPPAPI_C_EXPORT int project_save(project project, const char* path);
 
 #	ifdef __cplusplus
 }

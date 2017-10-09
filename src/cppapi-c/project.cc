@@ -24,4 +24,37 @@ extern "C"
 
 		return 0;
 	}
+
+	CPPAPI_C_EXPORT int cppapi_project_load(cppapi_project project, const char* path)
+	{
+		if (project == NULL) return 1;
+		if (path == NULL) return 2;
+
+		try
+		{
+			project->load(path);
+
+			return 0;
+		}
+		catch (...)
+		{
+			return -1;
+		}
+	}
+	CPPAPI_C_EXPORT int cppapi_project_save(cppapi_project project, const char* path)
+	{
+		if (project == NULL) return 1;
+		if (path == NULL) return 2;
+
+		try
+		{
+			project->save(path);
+
+			return 0;
+		}
+		catch (...)
+		{
+			return -1;
+		}
+	}
 }
