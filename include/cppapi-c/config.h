@@ -11,4 +11,6 @@
 #	define CPPAPI_C_EXPORT
 #endif
 
+#include <cppapi-c/error.h>
+
 #endif
