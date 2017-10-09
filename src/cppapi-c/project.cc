@@ -5,7 +5,7 @@
 
 extern "C"
 {
-	int cppapi_project_init(cppapi_project* project)
+	CPPAPI_C_EXPORT int cppapi_project_init(cppapi_project* project)
 	{
 		if (project == NULL) return 1;
 
@@ -15,7 +15,7 @@ extern "C"
 
 		return 0;
 	}
-	int cppapi_project_del(cppapi_project* project)
+	CPPAPI_C_EXPORT int cppapi_project_del(cppapi_project* project)
 	{
 		if (project == NULL) return 1;
 

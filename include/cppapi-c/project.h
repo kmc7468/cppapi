@@ -1,5 +1,6 @@
 #ifndef CPPAPI_C_HEADER_PROJECT_H
 #define CPPAPI_C_HEADER_PROJECT_H
+#include <cppapi-c/config.h>
 
 #ifdef __cplusplus
 #	include <cppapi/project.hh>
@@ -14,8 +15,8 @@ extern "C"
 {
 #endif
 	
-	int cppapi_project_init(cppapi_project* project);
-	int cppapi_project_del(cppapi_project* project);
+	CPPAPI_C_EXPORT int cppapi_project_init(cppapi_project* project);
+	CPPAPI_C_EXPORT int cppapi_project_del(cppapi_project* project);
 
 #ifdef __cplusplus
 }

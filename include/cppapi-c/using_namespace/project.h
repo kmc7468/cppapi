@@ -11,8 +11,8 @@ extern "C"
 {
 #	endif
 
-	int project_init(project* project);
-	int project_del(project* project);
+	CPPAPI_C_EXPORT int project_init(project* project);
+	CPPAPI_C_EXPORT int project_del(project* project);
 
 #	ifdef __cplusplus
 }
