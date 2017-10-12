@@ -6,6 +6,8 @@ import cppapi.code;
 #	include <cppapi/source.hh>
 
 #	include <cppapi/code.hh>
+
+#	include <new>
 #endif
 
 #include <cppapi/details/source.inc.hh>
@@ -110,6 +112,36 @@ namespace cppapi
 	source_io::source_io(const source_io& io_object)
 		: source_(io_object.source_)
 	{}
+
+	source* source_io::load_v0(std::FILE* file, bool is_big_endian, std::uint8_t** buffer,
+		project& project)
+	{
+		std::fread(*buffer, sizeof(bool), 1, file);
+		bool auto_remove = *reinterpret_cast<bool*>(*buffer);
+
+		std::fread(*buffer, sizeof(std::uint32_t), 1, file);
+		std::size_t name_length = *reinterpret_cast<std::uint32_t*>(*buffer);
+		BIG_ENDIAN_REVERSE(name_length);
+
+		*buffer = reinterpret_cast<std::uint8_t*>(std::realloc(*buffer, sizeof(std::uint8_t) * name_length));
+		if (*buffer == nullptr)
+			throw std::bad_alloc();
+		std::fread(*buffer, sizeof(std::uint8_t), name_length, file);
+		std::string name(reinterpret_cast<char*>(*buffer), name_length);
+
+		source* result = source::create(project, name, auto_remove);
+
+		std::fread(*buffer, sizeof(std::uint32_t), 1, file);
+		std::size_t codes_count = *reinterpret_cast<std::uint32_t*>(*buffer);
+		BIG_ENDIAN_REVERSE(codes_count);
+
+		for (std::size_t i = 0; i < codes_count; ++i)
+		{
+			result->codes_.push_back(code_io::load_v0(file, is_big_endian, buffer, result));
+		}
+
+		return result;
+	}
 
 	void source_io::save(std::FILE* file, bool is_big_endian) const
 	{

@@ -53,6 +53,10 @@ namespace cppapi
 		bool operator!=(const code_io& io_object) const = delete;
 
 	private:
+		static code* load_v0(std::FILE* file, bool is_big_endian, std::uint8_t** buffer,
+			source* source);
+
+	private:
 		void save(std::FILE* file, bool is_big_endian) const;
 
 	private:

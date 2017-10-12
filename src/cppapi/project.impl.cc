@@ -190,32 +190,7 @@ namespace cppapi
 
 		for (std::uint32_t i = 0; i < source_count; ++i)
 		{
-			std::fread(*buffer, sizeof(bool), 1, file);
-			bool src_auto_remove = *reinterpret_cast<bool*>(*buffer);
-			
-			std::fread(*buffer, sizeof(std::uint32_t), 1, file);
-			std::size_t src_name_length = *reinterpret_cast<std::uint32_t*>(*buffer);
-			BIG_ENDIAN_REVERSE(src_name_length);
-
-			*buffer = reinterpret_cast<std::uint8_t*>(std::realloc(*buffer, sizeof(std::uint8_t) * src_name_length));
-			if (*buffer == nullptr)
-				throw std::bad_alloc();
-			std::fread(*buffer, sizeof(std::uint8_t), src_name_length, file);
-			std::string src_name(reinterpret_cast<char*>(*buffer), src_name_length);
-
-			source* src = source::create(*this, src_name, src_auto_remove);
-
-			std::fread(*buffer, sizeof(std::uint32_t), 1, file);
-			std::size_t src_codes_count = *reinterpret_cast<std::uint32_t*>(*buffer);
-			BIG_ENDIAN_REVERSE(src_codes_count);
-
-			for (std::size_t j = 0; j < src_codes_count; ++j)
-			{
-				std::fread(*buffer, sizeof(bool), 1, file);
-				bool src_code_auto_remove = *reinterpret_cast<bool*>(*buffer);
-
-				code* src_code = code::create(src, src_code_auto_remove);
-			}
+			sources_.push_back(source_io::load_v0(file, is_big_endian, buffer, *this));
 		}
 	}
 

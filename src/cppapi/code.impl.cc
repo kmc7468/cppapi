@@ -66,6 +66,17 @@ namespace cppapi
 		: code_(io_object.code_)
 	{}
 
+	code* code_io::load_v0(std::FILE* file, bool is_big_endian, std::uint8_t** buffer,
+		source* source)
+	{
+		std::fread(*buffer, sizeof(bool), 1, file);
+		bool auto_remove = *reinterpret_cast<bool*>(*buffer);
+
+		code* result = code::create(source, auto_remove);
+
+		return result;
+	}
+
 	void code_io::save(std::FILE* file, bool is_big_endian) const
 	{
 		std::fwrite(&code_.auto_remove_, sizeof(bool), 1, file);
