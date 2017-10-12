@@ -2,14 +2,12 @@
 #define CPPAPI_C_HEADER_PROJECT_H
 #include <cppapi-c/config.h>
 
-#include <stddef.h>
-
 #ifdef __cplusplus
 #	include <cppapi/project.hh>
 
 typedef cppapi::project* cppapi_project;
 #else
-typedef struct project* cppapi_project;
+typedef struct cppapi_project* cppapi_project;
 #endif
 
 #ifdef __cplusplus
