@@ -8,7 +8,7 @@ namespace cppapi
 {
 	CPPAPI_CLASS code
 	{
-		friend class code_saver;
+		friend class code_io;
 
 	public:
 		code(const code& code) = delete;
@@ -24,7 +24,7 @@ namespace cppapi
 		static code* create(source* source, bool auto_remove);
 
 	public:
-		code_saver get_saver() const;
+		code_io get_io_object() const;
 
 	public:
 		bool auto_remove() const noexcept;
@@ -35,25 +35,22 @@ namespace cppapi
 		bool auto_remove_;
 	};
 
-	CPPAPI_CLASS code_saver final
+	CPPAPI_CLASS code_io final
 	{
 		friend class project;
-		friend class source_saver;
+		friend class source_io;
 
 	public:
-		code_saver(const code& code);
-		code_saver(const code_saver& saver);
-		code_saver(code_saver&& saver) noexcept = delete;
-		~code_saver();
+		code_io(const code& code);
+		code_io(const code_io& io_object);
+		code_io(code_io&& io_object) noexcept = delete;
+		~code_io();
 
 	public:
-		source_saver& operator=(const source_saver& saver) = delete;
-		source_saver& operator=(source_saver&& saver) noexcept = delete;
-		bool operator==(const source_saver& saver) const = delete;
-		bool operator!=(const source_saver& saver) const = delete;
-
-	private:
-		void operator()(std::FILE* file, bool is_big_endian) const;
+		code_io& operator=(const code_io& io_object) = delete;
+		code_io& operator=(code_io&& io_object) noexcept = delete;
+		bool operator==(const code_io& io_object) const = delete;
+		bool operator!=(const code_io& io_object) const = delete;
 
 	private:
 		void save(std::FILE* file, bool is_big_endian) const;

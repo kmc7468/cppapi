@@ -66,7 +66,7 @@ namespace cppapi
 		codes_.erase(code_iter);
 	}
 
-	source_saver source::get_saver() const
+	source_io source::get_io_object() const
 	{
 		return *this;
 	}
@@ -101,22 +101,17 @@ namespace cppapi
 			reinterpret_cast<std::uint8_t*>(&name) + sizeof(name));		\
 	}
 
-// source_saver 클래스
+// source_io 클래스
 namespace cppapi
 {
-	source_saver::source_saver(const source& source)
+	source_io::source_io(const source& source)
 		: source_(source)
 	{}
-	source_saver::source_saver(const source_saver& saver)
-		: source_(saver.source_)
+	source_io::source_io(const source_io& io_object)
+		: source_(io_object.source_)
 	{}
 
-	void source_saver::operator()(std::FILE* file, bool is_big_endian) const
-	{
-		save(file, is_big_endian);
-	}
-
-	void source_saver::save(std::FILE* file, bool is_big_endian) const
+	void source_io::save(std::FILE* file, bool is_big_endian) const
 	{
 		std::fwrite(&source_.auto_remove_, sizeof(bool), 1, file);
 		
@@ -132,7 +127,7 @@ namespace cppapi
 
 		for (const code* code : source_.codes_)
 		{
-			code->get_saver()(file, is_big_endian);
+			code->get_io_object().save(file, is_big_endian);
 		}
 	}
 }

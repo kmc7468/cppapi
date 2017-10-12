@@ -159,7 +159,7 @@ namespace cppapi
 
 		for (const source* src : sources_)
 		{
-			src->get_saver()(file, is_big_endian);
+			src->get_io_object().save(file, is_big_endian);
 		}
 	}
 	void project::add_source(source* source)
