@@ -73,4 +73,24 @@ extern "C"
 
 		return 0;
 	}
+	CPPAPI_C_EXPORT int cppapi_source_get_auto_remove(cppapi_source source, int* auto_remove)
+	{
+		if (source == NULL)
+			CPPAPI_C_ERROR("The argument 'source' can't be a NULL pointer.", 1);
+		if (auto_remove == NULL)
+			CPPAPI_C_ERROR("The argument 'auto_remove' can't be a NULL pointer.", 1);
+
+		*auto_remove = source->auto_remove();
+
+		return 0;
+	}
+	CPPAPI_C_EXPORT int cppapi_source_set_auto_remove(cppapi_source source, int auto_remove)
+	{
+		if (source == NULL)
+			CPPAPI_C_ERROR("The argument 'source' can't be a NULL pointer.", 1);
+
+		source->auto_remove(auto_remove);
+
+		return 0;
+	}
 }

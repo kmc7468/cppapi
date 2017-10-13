@@ -24,6 +24,8 @@ extern "C"
 	CPPAPI_C_EXPORT int cppapi_source_get_name_address(cppapi_source source, const char** name);
 	CPPAPI_C_EXPORT int cppapi_source_get_name_length(cppapi_source source, size_t* length);
 	CPPAPI_C_EXPORT int cppapi_source_set_name(cppapi_source source, const char* name);
+	CPPAPI_C_EXPORT int cppapi_source_get_auto_remove(cppapi_source source, int* auto_remove);
+	CPPAPI_C_EXPORT int cppapi_source_set_auto_remove(cppapi_source source, int auto_remove);
 
 #ifdef __cplusplus
 }
